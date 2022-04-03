@@ -4,6 +4,6 @@ Open AI Gym - Pendulum-v1 reinforcement learning
 
 ... updating...
 
-* score graph
+* add score graph
 
 * modify some code
