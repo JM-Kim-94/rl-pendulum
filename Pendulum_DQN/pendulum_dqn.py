@@ -50,10 +50,9 @@ class QNetwork(nn.Module):
     def __init__(self, state_dim, action_dim, q_lr):
         super(QNetwork, self).__init__()
 
-        self.fc_1 = nn.Linear(state_dim, 128)
-        self.fc_2 = nn.Linear(128, 64)
-        self.fc_3 = nn.Linear(64, 64)
-        self.fc_out = nn.Linear(64, action_dim)
+        self.fc_1 = nn.Linear(state_dim, 64)
+        self.fc_2 = nn.Linear(64, 32)
+        self.fc_out = nn.Linear(32, action_dim)
 
         self.lr = q_lr
 
@@ -62,7 +61,6 @@ class QNetwork(nn.Module):
     def forward(self, x):
         q = F.leaky_relu(self.fc_1(x))
         q = F.leaky_relu(self.fc_2(q))
-        q = F.leaky_relu(self.fc_3(q))
         q = self.fc_out(q)
         return q
 
@@ -70,15 +68,15 @@ class QNetwork(nn.Module):
 class DQNAgent:
     def __init__(self):
         self.state_dim     = 3
-        self.action_dim    = 201  # 9개 행동 : -2, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0
-        self.lr            = 0.0005
+        self.action_dim    = 9  # 9개 행동 : -2, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0
+        self.lr            = 0.01
         self.gamma         = 0.98
-        self.tau           = 0.001
+        self.tau           = 0.01
         self.epsilon       = 1.0
-        self.epsilon_decay = 0.995
+        self.epsilon_decay = 0.98
         self.epsilon_min   = 0.001
         self.buffer_size   = 100000
-        self.batch_size    = 100
+        self.batch_size    = 200
         self.memory        = ReplayBuffer(self.buffer_size)
 
         self.Q        = QNetwork(self.state_dim, self.action_dim, self.lr)
@@ -95,8 +93,8 @@ class DQNAgent:
                 real_action = (action - 4) / 4
                 maxQ_action_count = 1
         else:
-            action = np.random.choice([n for n in range(200)])
-            real_action = (action - 100) / 50  # -2, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0
+            action = np.random.choice([n for n in range(9)])
+            real_action = (action - 4) / 2  # -2, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0
 
         return action, real_action, maxQ_action_count
 
@@ -129,13 +127,22 @@ class DQNAgent:
 
 if __name__ == '__main__':
 
+    ###### logging ######
+    log_name = '0404'
+
+    model_save_dir = 'saved_model/' + log_name
+    if not os.path.isdir(model_save_dir): os.mkdir(model_save_dir)
+    log_save_dir = 'log/' + log_name
+    if not os.path.isdir(log_save_dir): os.mkdir(log_save_dir)
+    ###### logging ######
+
     agent = DQNAgent()
 
     env = gym.make('Pendulum-v1')
 
-    EPISODE = 1500
+    EPISODE = 500
     print_once = True
-    score_list = [-2000]
+    score_list = []  # [-2000]
 
     for EP in range(EPISODE):
         state = env.reset()
@@ -159,13 +166,13 @@ if __name__ == '__main__':
                 print_once = False
                 agent.train_agent()
 
-        # if EP % 2 == 0:  # 2 에피소드 마다 액터 네트워크 저장
-        #     torch.save(agent.Q.state_dict(), "save_model/DQN_Q_EP" + str(EP) + ".pt")
+        if EP % 10 == 0:
+            torch.save(agent.Q.state_dict(), model_save_dir + "/DQN_Q_EP"+str(EP)+".pt")
 
-        if score > max(score_list):  # 스코어 리스트의 최댓값을 갱신하면 모델 저장
-            # torch.save(agent.Q.state_dict(), "save_model/1225/DQN_Q_EP" + str(EP) + ".pt")
-            torch.save(agent.Q.state_dict(), "save_model/DQN_Q_network.pt")
-            print("...모델 저장...")
+        # if score > max(score_list):  # 스코어 리스트의 최댓값을 갱신하면 모델 저장
+        #     # torch.save(agent.Q.state_dict(), "save_model/1225/DQN_Q_EP" + str(EP) + ".pt")
+        #     torch.save(agent.Q.state_dict(), "save_model/DQN_Q_network.pt")
+        #     print("...모델 저장...")
 
         print("EP:{}, Avg_Score:{:.1f}, MaxQ_Action_Count:{}, Epsilon:{:.5f}".format(EP, score, maxQ_action_count, agent.epsilon))
         score_list.append(score)
@@ -178,5 +185,5 @@ if __name__ == '__main__':
     plt.plot(score_list)
     plt.show()
 
-    np.savetxt('pendulum_dqn_score_1225.txt', score_list)
+    np.savetxt(log_save_dir + '/pendulum_score.txt', score_list)
 

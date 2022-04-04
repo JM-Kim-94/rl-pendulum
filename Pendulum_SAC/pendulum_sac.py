@@ -53,10 +53,10 @@ class PolicyNetwork(nn.Module):
     def __init__(self, state_dim, action_dim, actor_lr):
         super(PolicyNetwork, self).__init__()
 
-        self.fc_1 = nn.Linear(state_dim, 200)
-        self.fc_2 = nn.Linear(200, 200)
-        self.fc_mu = nn.Linear(200, action_dim)
-        self.fc_std = nn.Linear(200, action_dim)
+        self.fc_1 = nn.Linear(state_dim, 64)
+        self.fc_2 = nn.Linear(64, 64)
+        self.fc_mu = nn.Linear(64, action_dim)
+        self.fc_std = nn.Linear(64, action_dim)
 
         self.lr = actor_lr
 
@@ -96,10 +96,10 @@ class QNetwork(nn.Module):
     def __init__(self, state_dim, action_dim, critic_lr):
         super(QNetwork, self).__init__()
 
-        self.fc_s = nn.Linear(state_dim, 100)
-        self.fc_a = nn.Linear(action_dim, 100)
-        self.fc_1 = nn.Linear(200, 200)
-        self.fc_out = nn.Linear(200, action_dim)
+        self.fc_s = nn.Linear(state_dim, 32)
+        self.fc_a = nn.Linear(action_dim, 32)
+        self.fc_1 = nn.Linear(64, 64)
+        self.fc_out = nn.Linear(64, action_dim)
 
         self.lr = critic_lr
 
@@ -118,15 +118,15 @@ class SAC_Agent:
     def __init__(self):
         self.state_dim      = 3  # [cos(theta), sin(theta), theta_dot]
         self.action_dim     = 1  # [torque] in[-2,2]
-        self.lr_pi          = 0.0005
+        self.lr_pi          = 0.001
         self.lr_q           = 0.001
         self.gamma          = 0.98
-        self.batch_size     = 500
+        self.batch_size     = 200
         self.buffer_limit   = 100000
-        self.tau            = 0.001   # for soft-update of Q using Q-target
+        self.tau            = 0.005   # for soft-update of Q using Q-target
         self.init_alpha     = 0.01
         self.target_entropy = -self.action_dim  # == -1
-        self.lr_alpha       = 0.001
+        self.lr_alpha       = 0.005
         self.DEVICE         = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.memory         = ReplayBuffer(self.buffer_limit, self.DEVICE)
         print("사용 장치 : ", self.DEVICE)
@@ -213,7 +213,7 @@ class SAC_Agent:
 if __name__ == '__main__':
 
     ###### logging ######
-    log_name = '1222'
+    log_name = '0404'
 
     model_save_dir = 'saved_model/' + log_name
     if not os.path.isdir(model_save_dir): os.mkdir(model_save_dir)
@@ -221,7 +221,7 @@ if __name__ == '__main__':
     if not os.path.isdir(log_save_dir): os.mkdir(log_save_dir)
     ###### logging ######
 
-    env = gym.make('Pendulum-v0')
+    env = gym.make('Pendulum-v1')
     agent = SAC_Agent()
 
     EPISODE = 500
@@ -244,7 +244,7 @@ if __name__ == '__main__':
 
             state = state_prime
 
-            if agent.memory.size() > 2000:  # 2000개의 [s,a,r,s']이 쌓이면 학습 시작
+            if agent.memory.size() > 1000:  # 1000개의 [s,a,r,s']이 쌓이면 학습 시작
                 if print_once: print("학습시작!")
                 print_once = False
                 agent.train_agent()

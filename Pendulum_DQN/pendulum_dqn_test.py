@@ -15,10 +15,9 @@ class QNetwork(nn.Module):
     def __init__(self, state_dim, action_dim, q_lr):
         super(QNetwork, self).__init__()
 
-        self.fc_1 = nn.Linear(state_dim, 128)
-        self.fc_2 = nn.Linear(128, 64)
-        self.fc_3 = nn.Linear(64, 64)
-        self.fc_out = nn.Linear(64, action_dim)
+        self.fc_1 = nn.Linear(state_dim, 64)
+        self.fc_2 = nn.Linear(64, 32)
+        self.fc_out = nn.Linear(32, action_dim)
 
         self.lr = q_lr
 
@@ -27,7 +26,6 @@ class QNetwork(nn.Module):
     def forward(self, x):
         q = F.leaky_relu(self.fc_1(x))
         q = F.leaky_relu(self.fc_2(q))
-        q = F.leaky_relu(self.fc_3(q))
         q = self.fc_out(q)
         return q
 
@@ -35,7 +33,7 @@ class QNetwork(nn.Module):
 class DQNAgent:
     def __init__(self, wight_file_path):
         self.state_dim     = 3
-        self.action_dim    = 201
+        self.action_dim    = 9
         self.lr            = 0.002
         self.trained_model = wight_file_path
 
@@ -45,12 +43,16 @@ class DQNAgent:
     def choose_action(self, state):
         with torch.no_grad():
             action = float(torch.argmax(self.Q(state)).numpy())
-            real_action = (action - 100) / 50
+            real_action = (action - 4) / 2
         return real_action
 
 
 if __name__ == '__main__':
-    weight_file_path = 'save_model/DQN_Q_network.pt'
+
+    log_name = '0404/'
+    weight_name = 'DQN_Q_EP410.pt'
+
+    weight_file_path = 'saved_model/' + log_name + weight_name
     agent = DQNAgent(weight_file_path)
 
     env = gym.make('Pendulum-v1')

@@ -1,6 +1,9 @@
 import matplotlib.pyplot as plt
 
-score_txt = open('pendulum_dqn_score.txt')
+log_name = '0404'
+
+log_dir = 'log/' + log_name
+score_txt = open(log_dir + '/pendulum_score.txt')
 
 data = score_txt.readlines()
 
