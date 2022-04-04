@@ -9,22 +9,20 @@ This repository implements the pendulum example through applying DQN and SAC alg
 * gym
 
 
-# Train and Test
-* Train and Test through SAC method
+# Train
+* Train through SAC method
 ```
 python3 Pendulum_SAC/pendulum_sac.py
-python3 Pendulum_SAC/pendulum_sac_test.py
 ```
 
-* Train and Test through DQN method
+* Train through DQN method
 ```
 python3 Pendulum_DQN/pendulum_dqn.py
-python3 Pendulum_DQN/pendulum_dqn_test.py
 ```
 
 
 # Results
 
-![Score-Graph](/images/score.png)
-
-![SAC](/images/pendulum_sac.gif)
+<img src="/images/score.png" width="600" height="400">
+  
+<img src="/images/pendulum_sac.gif" width="300" height="350">
