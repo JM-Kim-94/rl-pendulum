@@ -13,7 +13,7 @@ from collections import namedtuple, deque
 
 # Transition = namedtuple('Transition', ['s', 'a', 'r', 's_', 'd'])
 
-
+# ReplayBuffer from https://github.com/seungeunrho/minimalRL
 class ReplayBuffer():
     def __init__(self, buffer_limit, DEVICE):
         self.buffer = deque(maxlen=buffer_limit)

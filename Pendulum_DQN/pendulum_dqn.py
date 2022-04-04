@@ -12,6 +12,7 @@ from collections import deque
 import matplotlib.pyplot as plt
 
 
+# ReplayBuffer from https://github.com/seungeunrho/minimalRL
 class ReplayBuffer:
     def __init__(self, buffer_limit):
         self.buffer = deque(maxlen=buffer_limit)
