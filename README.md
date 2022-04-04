@@ -10,12 +10,12 @@ This repository implements the pendulum example through applying DQN and SAC alg
 
 
 # Train
-* Train through SAC method (you can change the name of log files folder at line 216)
+* Train through SAC method (you can change the name of log files folder at "line 216")
 ```
 python3 Pendulum_SAC/pendulum_sac.py
 ```
 
-* Train through DQN method (you can change the name of log files folder at line 132)
+* Train through DQN method (you can change the name of log files folder at "line 132")
 ```
 python3 Pendulum_DQN/pendulum_dqn.py
 ```
