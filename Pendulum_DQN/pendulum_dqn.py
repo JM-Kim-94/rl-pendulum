@@ -146,14 +146,14 @@ if __name__ == '__main__':
     score_list = []  # [-2000]
 
     for EP in range(EPISODE):
-        state = env.reset()
+        state, _ = env.reset()
         score, done = 0.0, False
         maxQ_action_count = 0
 
-        while not done:
+        while not (done or truncated):
             action, real_action, count = agent.choose_action(torch.FloatTensor(state))
 
-            state_prime, reward, done, _ = env.step([real_action])
+            state_prime, reward, done, truncated, _ = env.step([real_action])
 
             agent.memory.put((state, action, reward, state_prime, done))
 
